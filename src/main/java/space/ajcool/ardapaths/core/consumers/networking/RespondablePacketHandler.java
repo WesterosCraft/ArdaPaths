@@ -34,7 +34,7 @@ public abstract class RespondablePacketHandler<T extends IPacket, U extends IPac
     {
         super(channel);
         this.reader = reader;
-        responseChannelId = new Identifier(ArdaPaths.MOD_ID, responseChannel);
+        responseChannelId = Identifier.of(ArdaPaths.MOD_ID, responseChannel);
         this.responseReader = responseReader;
     }
 

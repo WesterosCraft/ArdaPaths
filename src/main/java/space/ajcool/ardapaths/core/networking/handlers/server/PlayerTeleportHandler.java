@@ -36,7 +36,7 @@ public class PlayerTeleportHandler extends ServerPacketHandler<PlayerTeleportPac
                 }
             }
 
-            player.teleport(packet.x(), packet.y(), packet.z());
+            player.teleport(packet.x(), packet.y(), packet.z(), false);
 
         });
     }

@@ -8,12 +8,12 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 @Environment(EnvType.CLIENT)
-public class PathParticleProvider implements ParticleFactory<DefaultParticleType>
+public class PathParticleProvider implements ParticleFactory<SimpleParticleType>
 {
     private final SpriteProvider sprite;
 
@@ -22,7 +22,7 @@ public class PathParticleProvider implements ParticleFactory<DefaultParticleType
         this.sprite = spriteSet;
     }
 
-    public Particle createParticle(DefaultParticleType simpleParticleType, ClientWorld level, double x, double y, double z, double encodedColorA, double encodedColorB, double encodedColorC)
+    public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld level, double x, double y, double z, double encodedColorA, double encodedColorB, double encodedColorC)
     {
         var glowParticle = new GlowParticle(level, x, y, z, 0.0, 0.0, 0.0, this.sprite)
         {

@@ -33,7 +33,7 @@ public class ModItemGroups
      */
     private static ItemGroup register(final String id, final ItemGroup group, Item... items)
     {
-        RegistryKey<ItemGroup> key = RegistryKey.of(Registries.ITEM_GROUP.getKey(), new Identifier(ArdaPaths.MOD_ID, id));
+        RegistryKey<ItemGroup> key = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(ArdaPaths.MOD_ID, id));
         if (Registries.ITEM_GROUP.contains(key))
         {
             return Registries.ITEM_GROUP.get(key);

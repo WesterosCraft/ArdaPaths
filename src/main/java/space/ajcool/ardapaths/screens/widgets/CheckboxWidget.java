@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 public class CheckboxWidget extends PressableWidget
 {
-    private static final Identifier TEXTURE = new Identifier("textures/gui/checkbox.png");
+    private static final Identifier TEXTURE = Identifier.of("textures/gui/checkbox.png");
     private final Text text;
     private boolean checked;
     private boolean enabled;
@@ -30,7 +30,7 @@ public class CheckboxWidget extends PressableWidget
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta)
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
     {
         int x = this.getX();
         int y = this.getY();

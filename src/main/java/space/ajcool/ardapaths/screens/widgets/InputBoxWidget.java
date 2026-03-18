@@ -100,9 +100,9 @@ public class InputBoxWidget extends EditBoxWidget
      * overdraw its text in a light gray color and show a tooltip when hovered.
      */
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta)
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
     {
-        super.render(context, mouseX, mouseY, delta);
+        super.renderWidget(context, mouseX, mouseY, delta);
 
         if (!enabled)
         {
@@ -123,7 +123,7 @@ public class InputBoxWidget extends EditBoxWidget
             String raw = this.getText();
 
             // Convert raw text → colored styled text (you define this)
-            Text colored = Text.literal(this.getText()).fillStyle(Style.EMPTY.withColor(backgroundColor));;
+            Text colored = Text.literal(this.getText()).fillStyle(Style.EMPTY.withColor(backgroundColor));
 
             // Coordinates for drawing inside the box
             int textX = this.getX() + 4;

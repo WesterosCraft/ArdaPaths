@@ -1,6 +1,6 @@
 plugins {
-    id "fabric-loom" version "1.7-SNAPSHOT"
-    id "maven-publish"
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+    id 'maven-publish'
 }
 
 version = project.mod_version
@@ -32,7 +32,7 @@ dependencies {
     compileOnly("curse.maven:huskhomes-849217:5468607")
 
     // Arda regions
-    modApi(files("build/libs/arda-regions-1.0.0.jar"))
+//    modApi(files("build/libs/arda-regions-1.0.0.jar"))
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${devauth_version}")
 }

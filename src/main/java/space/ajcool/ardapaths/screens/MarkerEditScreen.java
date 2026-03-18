@@ -461,7 +461,7 @@ public class MarkerEditScreen extends Screen
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta)
     {
-        this.renderBackground(context);
+        this.renderBackground(context, mouseX, mouseY, delta);
 
         int centerX = this.width / 2;
         int currentY = 112;
@@ -488,7 +488,6 @@ public class MarkerEditScreen extends Screen
     @Override
     public void tick()
     {
-        this.multiLineEditBox.tick();
         super.tick();
     }
 

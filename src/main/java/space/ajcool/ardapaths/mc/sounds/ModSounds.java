@@ -17,7 +17,7 @@ public class ModSounds
      */
     private static SoundEvent register(final String id)
     {
-        final Identifier identifier = new Identifier(ArdaPaths.MOD_ID, id);
+        final Identifier identifier = Identifier.of(ArdaPaths.MOD_ID, id);
         return Registry.register(Registries.SOUND_EVENT, identifier, SoundEvent.of(identifier));
     }
 

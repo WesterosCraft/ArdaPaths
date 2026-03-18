@@ -18,15 +18,12 @@ public class JournalListWidget extends EntryListWidget<JournalListEntry> {
      * @param client     The Minecraft client
      * @param width      The width of the widget
      * @param height     The height of the widget
-     * @param top        The top position of the widget
-     * @param bottom     The bottom position of the widget
+     * @param y          The y position of the widget
      * @param itemHeight The height of each item (not used for variable height entries)
      */
-    public JournalListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
-        super(client, width, height, top, bottom, itemHeight);
-        setRenderBackground(false);
+    public JournalListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) {
+        super(client, width, height, y, itemHeight);
         setRenderHeader(false, 0);
-        setRenderHorizontalShadows(false);
     }
 
     /**
@@ -41,12 +38,12 @@ public class JournalListWidget extends EntryListWidget<JournalListEntry> {
      * Position the scrollbar on the right side of the list.
      */
     @Override
-    protected int getScrollbarPositionX() {
-        return this.left + this.width - 6;
+    protected int getScrollbarX() {
+        return this.getX() + this.width - 6;
     }
 
     /**
-     *  Add a journal entry to the list.
+     * Add a journal entry to the list.
      */
     public void addJournalEntry(JournalListEntry entry) {
         this.addEntry(entry);
@@ -64,7 +61,9 @@ public class JournalListWidget extends EntryListWidget<JournalListEntry> {
         return total + this.headerHeight;
     }
 
-    /** Render the list with variable height entries.
+    /**
+     * Render the list with variable height entries.
+     *
      * @param context The draw context
      * @param mouseX  The mouse x position
      * @param mouseY  The mouse y position
@@ -75,14 +74,14 @@ public class JournalListWidget extends EntryListWidget<JournalListEntry> {
 
         int rowLeft = this.getRowLeft();
         int rowWidth = this.getRowWidth();
-        int currentY = this.top + 4 - (int) this.getScrollAmount();
+        int currentY = this.getY() + 4 - (int) this.getScrollAmount();
 
         for (int i = 0; i < this.getEntryCount(); i++) {
 
             JournalListEntry entry = this.getEntry(i);
             int entryHeight = entry.getHeight(rowWidth);
 
-            if (currentY + entryHeight >= this.top && currentY <= this.bottom) {
+            if (currentY + entryHeight >= this.getY() && currentY <= this.getBottom()) {
                 entry.render(context, i, currentY, rowLeft, rowWidth, entryHeight,
                         mouseX, mouseY, this.isMouseOver(mouseX, mouseY) && this.getEntryAtPosition(mouseX, mouseY) == entry, delta);
             }
@@ -92,13 +91,14 @@ public class JournalListWidget extends EntryListWidget<JournalListEntry> {
 
     /**
      * Get the entry at the given position, accounting for variable heights.
+     *
      * @param x The x position
      * @param y The y position
-     * @return  The entry at the given position, or null if none.
+     * @return The entry at the given position, or null if none.
      */
     private JournalListEntry getJournalEntryAtPosition(double x, double y) {
 
-        int currentY = this.top + 4 - (int) this.getScrollAmount();
+        int currentY = this.getY() + 4 - (int) this.getScrollAmount();
 
         for (int i = 0; i < this.getEntryCount(); i++) {
             JournalListEntry entry = this.getEntry(i);
@@ -114,9 +114,10 @@ public class JournalListWidget extends EntryListWidget<JournalListEntry> {
     /**
      * Handle mouse clicks to delegate to entries.
      * This is necessary because entries have variable heights.
+     *
      * @param mouseX The mouse x position
      * @param mouseY The mouse y position
-     * @param button  The mouse button
+     * @param button The mouse button
      * @return true if the click was handled by an entry, false otherwise.
      */
     @Override
@@ -140,7 +141,7 @@ public class JournalListWidget extends EntryListWidget<JournalListEntry> {
      * Append narration information for accessibility.
      */
     @Override
-    public void appendNarrations(NarrationMessageBuilder builder) {
+    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
 
         JournalListEntry selected = this.getSelectedOrNull();
 

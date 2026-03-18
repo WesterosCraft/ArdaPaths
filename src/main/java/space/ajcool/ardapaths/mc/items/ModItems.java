@@ -1,6 +1,6 @@
 package space.ajcool.ardapaths.mc.items;
 
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+//import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -13,7 +13,7 @@ public class ModItems
 {
     public static final PathRevealerItem PATH_REVEALER = register(
             "path_revealer",
-            new PathRevealerItem(new FabricItemSettings().maxCount(1).fireproof().rarity(Rarity.EPIC))
+            new PathRevealerItem(new Item.Settings().maxCount(1).fireproof().rarity(Rarity.EPIC))
     );
     public static final Item PATH_MARKER = ModBlocks.PATH_MARKER.asItem();
 

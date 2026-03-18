@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 public class DropdownWidget<T> extends ClickableWidget
 {
-    private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/widgets.png");
+    private static final Identifier WIDGETS_TEXTURE = Identifier.of("textures/gui/widgets.png");
 
     private final int originalWidth;
     private final int originalHeight;
@@ -58,10 +58,10 @@ public class DropdownWidget<T> extends ClickableWidget
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta)
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
     {
         // First, draw the button itself.
-        super.render(context, mouseX, mouseY, delta);
+        renderButton(context, mouseX, mouseY, delta);
         Text title = this.getMessage();
         if (title != null)
         {
@@ -110,8 +110,7 @@ public class DropdownWidget<T> extends ClickableWidget
         }
     }
 
-    @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta)
+    private void renderButton(DrawContext context, int mouseX, int mouseY, float delta)
     {
         TextRenderer textRenderer = Client.mc().textRenderer;
         int x = getX();
@@ -154,11 +153,27 @@ public class DropdownWidget<T> extends ClickableWidget
     private void renderBox(DrawContext context, int x, int y, T item, TextRenderer textRenderer,
                            int width, int height, int v)
     {
-        context.drawNineSlicedTexture(WIDGETS_TEXTURE, x, y, width, height, 20, 4, 200, 20, 0, v);
+        drawNineSlicedTexture(context, WIDGETS_TEXTURE, x, y, width, height, 4, 200, 20, 0, v);
+
         Text display = (item == null) ? Text.literal("None") : optionDisplay.apply(item);
         int textX = x + 4;
         int textY = y + (height - textRenderer.fontHeight) / 2;
         context.drawTextWithShadow(textRenderer, display, textX, textY, 0xFFFFFF);
+    }
+
+    /**
+     * Draws a nine-sliced texture manually because drawNineSlicedTexture was removed in 1.21.
+     */
+    private static void drawNineSlicedTexture(DrawContext context, Identifier texture,
+                                              int x, int y, int width, int height,
+                                              int edgeWidth, int texW, int texH, int u, int v)
+    {
+        // Left edge
+        context.drawTexture(texture, x, y, edgeWidth, height, u, v, edgeWidth, texH, 256, 256);
+        // Middle (stretched)
+        context.drawTexture(texture, x + edgeWidth, y, width - edgeWidth * 2, height, u + edgeWidth, v, texW - edgeWidth * 2, texH, 256, 256);
+        // Right edge
+        context.drawTexture(texture, x + width - edgeWidth, y, edgeWidth, height, u + texW - edgeWidth, v, edgeWidth, texH, 256, 256);
     }
 
     /**
@@ -212,7 +227,6 @@ public class DropdownWidget<T> extends ClickableWidget
                 selected = item;
                 if (onSelect != null)
                 {
-                    System.out.println("Accepting");
                     onSelect.accept(item);
                 }
             }
@@ -227,7 +241,7 @@ public class DropdownWidget<T> extends ClickableWidget
      * the user can scroll using the mouse wheel.
      */
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount)
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
     {
         if (expanded)
         {
@@ -241,13 +255,13 @@ public class DropdownWidget<T> extends ClickableWidget
             if (totalItems > maxVisibleOptions)
             {
                 // Adjust scrollOffset
-                scrollOffset -= (int) amount;
+                scrollOffset -= (int) verticalAmount;
                 scrollOffset = Math.max(0, scrollOffset);
                 scrollOffset = Math.min(scrollOffset, totalItems - maxVisibleOptions);
                 return true;
             }
         }
-        return super.mouseScrolled(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
