@@ -1,5 +1,6 @@
 package space.ajcool.ardapaths.mc.blocks;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -39,7 +40,13 @@ public class PathMarkerBlock extends BlockWithEntity
         super(properties);
     }
 
-    public ActionResult onUse(BlockState blockState, World level, BlockPos blockPos, PlayerEntity player, Hand interactionHand, BlockHitResult blockHitResult)
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return createCodec(PathMarkerBlock::new);
+    }
+
+    @Override
+    protected ActionResult onUse(BlockState blockState, World level, BlockPos blockPos, PlayerEntity player, BlockHitResult blockHitResult)
     {
         BlockEntity selectedBlockEntity = level.getBlockEntity(blockPos);
 
@@ -93,7 +100,7 @@ public class PathMarkerBlock extends BlockWithEntity
                         data.setTarget(blockPos.subtract(selectedBlockPosition));
                     }
 
-                    PathMarkerUpdatePacket packet = new PathMarkerUpdatePacket(pathMarker.getPos(), pathMarker.createNbt());
+                    PathMarkerUpdatePacket packet = new PathMarkerUpdatePacket(pathMarker.getPos(), pathMarker.createNbt(level.getRegistryManager()));
                     PacketRegistry.PATH_MARKER_UPDATE.send(packet);
                     player.sendMessage(message);
                     ArdaPaths.LOGGER.info("Sending Update Packet");
@@ -135,6 +142,6 @@ public class PathMarkerBlock extends BlockWithEntity
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World level, BlockState blockState, BlockEntityType<T> blockEntityType)
     {
-        return level.isClient ? checkType(blockEntityType, ModBlockEntities.PATH_MARKER, PathMarkerBlockEntity::tick) : null;
+        return validateTicker(blockEntityType, ModBlockEntities.PATH_MARKER, PathMarkerBlockEntity::tick);
     }
 }

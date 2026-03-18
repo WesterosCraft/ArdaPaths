@@ -2,6 +2,7 @@ package space.ajcool.ardapaths.paths.rendering;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Hand;
 import org.jetbrains.annotations.NotNull;
 import space.ajcool.ardapaths.core.Client;
@@ -39,7 +40,8 @@ public class ProximityRenderer {
 
     private AnimatedTitle currentDisplayedTitle;
 
-    public static void render(DrawContext context, float delta) {
+    public static void render(DrawContext context, RenderTickCounter tickCounter) {
+        float delta = tickCounter.getTickDelta(true);
         INSTANCE.renderNextItem(context, delta);
         updateVisualMessageStack(context);
     }
