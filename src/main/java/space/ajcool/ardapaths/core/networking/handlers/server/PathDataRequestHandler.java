@@ -1,29 +1,36 @@
 package space.ajcool.ardapaths.core.networking.handlers.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import space.ajcool.ardapaths.ArdaPaths;
-import space.ajcool.ardapaths.core.consumers.networking.RespondablePacketHandler;
 import space.ajcool.ardapaths.core.data.Json;
-import space.ajcool.ardapaths.core.networking.packets.EmptyPacket;
 import space.ajcool.ardapaths.core.networking.packets.client.PathDataResponsePacket;
+import space.ajcool.ardapaths.core.networking.packets.server.PathDataRequestPayload;
 
-/**
- * A packet sent from the client to the server to request path data.
- */
-public class PathDataRequestHandler extends RespondablePacketHandler<EmptyPacket, PathDataResponsePacket>
-{
-    public PathDataRequestHandler()
-    {
-        super("path_data_request", EmptyPacket::read, "path_data_response", PathDataResponsePacket::read);
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+public class PathDataRequestHandler {
+
+    private final Map<UUID, Consumer<PathDataResponsePacket>> responseConsumers = new HashMap<>();
+
+    public void send(Consumer<PathDataResponsePacket> consumer) {
+        UUID requestId = UUID.randomUUID();
+        responseConsumers.put(requestId, consumer);
+        ClientPlayNetworking.send(new PathDataRequestPayload(requestId));
     }
 
-    @Override
-    public PathDataResponsePacket handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, EmptyPacket packet, PacketSender sender)
-    {
+    public void receiveOnServer(PathDataRequestPayload payload, ServerPlayNetworking.Context context) {
         String json = Json.toJson(ArdaPaths.CONFIG.getPaths());
-        return new PathDataResponsePacket(json);
+        context.responseSender().sendPacket(
+                new PathDataResponsePacket(payload.requestId(), json)
+        );
+    }
+
+    public void receiveOnClient(PathDataResponsePacket payload, ClientPlayNetworking.Context context) {
+        Consumer<PathDataResponsePacket> consumer = responseConsumers.remove(payload.requestId());
+        if (consumer != null) consumer.accept(payload);
     }
 }

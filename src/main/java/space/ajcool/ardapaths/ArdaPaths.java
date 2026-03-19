@@ -17,7 +17,6 @@ import space.ajcool.ardapaths.core.PermissionHelper;
 import space.ajcool.ardapaths.core.data.config.ServerConfigManager;
 import space.ajcool.ardapaths.core.data.config.server.ServerConfig;
 import space.ajcool.ardapaths.core.networking.PacketRegistry;
-import space.ajcool.ardapaths.core.networking.packets.EmptyPacket;
 import space.ajcool.ardapaths.mc.blocks.ModBlocks;
 import space.ajcool.ardapaths.mc.blocks.entities.ModBlockEntities;
 import space.ajcool.ardapaths.mc.blocks.entities.PathMarkerBlockEntity;

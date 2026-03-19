@@ -1,25 +1,25 @@
 package space.ajcool.ardapaths.core.networking.packets.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.network.PacketByteBuf;
-import space.ajcool.ardapaths.core.consumers.networking.IPacket;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 
-public record ChapterPlayerTeleportPacket(String pathId, String chapterId) implements IPacket
-{
+public record ChapterPlayerTeleportPacket(String pathId, String chapterId) implements CustomPayload {
+
+    public static final CustomPayload.Id<ChapterPlayerTeleportPacket> ID =
+            new CustomPayload.Id<>(Identifier.of("ardapaths", "chapter_player_teleport"));
+
+    public static final PacketCodec<? super RegistryByteBuf, ChapterPlayerTeleportPacket> CODEC =
+            PacketCodec.tuple(
+                    PacketCodecs.STRING, ChapterPlayerTeleportPacket::pathId,
+                    PacketCodecs.STRING, ChapterPlayerTeleportPacket::chapterId,
+                    ChapterPlayerTeleportPacket::new
+            );
 
     @Override
-    public PacketByteBuf build()
-    {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeString(pathId);
-        buf.writeString(chapterId);
-        return buf;
-    }
-
-    public static ChapterPlayerTeleportPacket read(PacketByteBuf buf)
-    {
-        final String pathId = buf.readString();
-        final String chapterId = buf.readString();
-        return new ChapterPlayerTeleportPacket(pathId, chapterId);
+    public CustomPayload.Id<ChapterPlayerTeleportPacket> getId() {
+        return ID;
     }
 }

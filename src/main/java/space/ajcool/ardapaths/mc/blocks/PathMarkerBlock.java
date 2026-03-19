@@ -23,7 +23,6 @@ import space.ajcool.ardapaths.ArdaPaths;
 import space.ajcool.ardapaths.ArdaPathsClient;
 import space.ajcool.ardapaths.core.Client;
 import space.ajcool.ardapaths.core.networking.PacketRegistry;
-import space.ajcool.ardapaths.core.networking.packets.EmptyPacket;
 import space.ajcool.ardapaths.core.networking.packets.server.PathMarkerUpdatePacket;
 import space.ajcool.ardapaths.mc.blocks.entities.ModBlockEntities;
 import space.ajcool.ardapaths.mc.blocks.entities.PathMarkerBlockEntity;
@@ -54,7 +53,7 @@ public class PathMarkerBlock extends BlockWithEntity
         if (!player.isHolding(ModItems.PATH_MARKER) || !(selectedBlockEntity instanceof PathMarkerBlockEntity pathMarkerBlockEntity)) return ActionResult.PASS;
         if (!level.isClient()) return ActionResult.CONSUME;
 
-        PacketRegistry.PERMISSION_CHECK.send(new EmptyPacket(),response -> {
+        PacketRegistry.PERMISSION_CHECK.send(response -> {
             if (response.hasPermission()) this.validateOnUse(level, blockPos, pathMarkerBlockEntity, player);
         });
 

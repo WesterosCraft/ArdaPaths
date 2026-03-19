@@ -1,25 +1,19 @@
 package space.ajcool.ardapaths.core.networking.handlers.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import space.ajcool.ardapaths.ArdaPaths;
-import space.ajcool.ardapaths.core.consumers.networking.ServerPacketHandler;
 import space.ajcool.ardapaths.core.networking.packets.server.ChapterStartRemovePacket;
 
-public class ChapterStartRemoveHandler extends ServerPacketHandler<ChapterStartRemovePacket>
-{
-    public ChapterStartRemoveHandler()
-    {
-        super("chapter_start_remove", ChapterStartRemovePacket::read);
+public class ChapterStartRemoveHandler {
+
+    public void send(ChapterStartRemovePacket packet) {
+        ClientPlayNetworking.send(packet);
     }
 
-    @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, ChapterStartRemovePacket packet, PacketSender sender)
-    {
-        final String pathId = packet.pathId();
-        final String chapterId = packet.chapterId();
+    public void receive(ChapterStartRemovePacket payload, ServerPlayNetworking.Context context) {
+        final String pathId = payload.pathId();
+        final String chapterId = payload.chapterId();
         ArdaPaths.CONFIG.removeChapterStart(pathId, chapterId);
         ArdaPaths.CONFIG_MANAGER.save();
     }

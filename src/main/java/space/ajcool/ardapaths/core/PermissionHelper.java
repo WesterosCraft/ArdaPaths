@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import space.ajcool.ardapaths.ArdaPaths;
 import space.ajcool.ardapaths.core.networking.PacketRegistry;
-import space.ajcool.ardapaths.core.networking.packets.EmptyPacket;
 
 public class PermissionHelper {
 
@@ -39,7 +38,7 @@ public class PermissionHelper {
             ArdaPaths.LOGGER.info("Refreshing permissions");
 
             lastPermissionCheckTime = currentTime;
-            PacketRegistry.PERMISSION_CHECK.send(new EmptyPacket(), response -> {hasEditPermission = response.hasPermission();});
+            PacketRegistry.PERMISSION_CHECK.send(response -> {hasEditPermission = response.hasPermission();});
 
             // Default to false until we get a response from the server
             return hasEditPermission != null ? hasEditPermission : false;

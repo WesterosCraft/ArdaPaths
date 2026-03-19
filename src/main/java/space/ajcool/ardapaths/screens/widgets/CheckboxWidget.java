@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 public class CheckboxWidget extends PressableWidget
 {
-    private static final Identifier TEXTURE = Identifier.of("textures/gui/checkbox.png");
+    private static final Identifier TEXTURE = Identifier.of("textures/gui/sprites/widget/checkbox.png");
     private final Text text;
     private boolean checked;
     private boolean enabled;

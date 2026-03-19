@@ -1,28 +1,35 @@
 package space.ajcool.ardapaths.core.networking.handlers.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import space.ajcool.ardapaths.core.PermissionHelper;
-import space.ajcool.ardapaths.core.consumers.networking.RespondablePacketHandler;
-import space.ajcool.ardapaths.core.networking.packets.EmptyPacket;
 import space.ajcool.ardapaths.core.networking.packets.client.ArdaPathsPermissionCheckResponsePacket;
+import space.ajcool.ardapaths.core.networking.packets.server.PermissionCheckRequestPayload;
 
-public class ArdaPathsPermissionCheckHandler extends RespondablePacketHandler<EmptyPacket, ArdaPathsPermissionCheckResponsePacket> {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
 
-    private static final String REQUEST_CHANNEL = "ardapaths_permission_check_request";
-    private static final String RESPONSE_CHANNEL = "ardapaths_permission_check_response";
+public class ArdaPathsPermissionCheckHandler {
 
-    public ArdaPathsPermissionCheckHandler() {
-        super(REQUEST_CHANNEL, EmptyPacket::read, RESPONSE_CHANNEL, ArdaPathsPermissionCheckResponsePacket::read);
+    private final Map<UUID, Consumer<ArdaPathsPermissionCheckResponsePacket>> responseConsumers = new HashMap<>();
+
+    public void send(Consumer<ArdaPathsPermissionCheckResponsePacket> consumer) {
+        UUID requestId = UUID.randomUUID();
+        responseConsumers.put(requestId, consumer);
+        ClientPlayNetworking.send(new PermissionCheckRequestPayload(requestId));
     }
 
-    @Override
-    public ArdaPathsPermissionCheckResponsePacket handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, EmptyPacket packet, PacketSender sender) {
+    public void receiveOnServer(PermissionCheckRequestPayload payload, ServerPlayNetworking.Context context) {
+        boolean hasPerm = PermissionHelper.hasEditPermission(context.player());
+        context.responseSender().sendPacket(
+                new ArdaPathsPermissionCheckResponsePacket(payload.requestId(), hasPerm)
+        );
+    }
 
-        if (player == null) return new ArdaPathsPermissionCheckResponsePacket(false);
-
-        return new ArdaPathsPermissionCheckResponsePacket(PermissionHelper.hasEditPermission(player));
+    public void receiveOnClient(ArdaPathsPermissionCheckResponsePacket payload, ClientPlayNetworking.Context context) {
+        Consumer<ArdaPathsPermissionCheckResponsePacket> consumer = responseConsumers.remove(payload.requestId());
+        if (consumer != null) consumer.accept(payload);
     }
 }

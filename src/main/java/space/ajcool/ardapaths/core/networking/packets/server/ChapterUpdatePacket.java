@@ -1,8 +1,10 @@
 package space.ajcool.ardapaths.core.networking.packets.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.network.PacketByteBuf;
-import space.ajcool.ardapaths.core.consumers.networking.IPacket;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 import space.ajcool.ardapaths.core.data.config.shared.ChapterData;
 
 public record ChapterUpdatePacket(
@@ -12,35 +14,28 @@ public record ChapterUpdatePacket(
         String chapterDate,
         int chapterIndex,
         String warp
-) implements IPacket
-{
+) implements CustomPayload {
 
-    public ChapterUpdatePacket(String pathId, ChapterData chapter)
-    {
+    public ChapterUpdatePacket(String pathId, ChapterData chapter) {
         this(pathId, chapter.getId(), chapter.getName(), chapter.getDate(), chapter.getIndex(), chapter.getWarp());
     }
 
-    @Override
-    public PacketByteBuf build()
-    {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeString(pathId);
-        buf.writeString(chapterId);
-        buf.writeString(chapterName);
-        buf.writeString(chapterDate);
-        buf.writeInt(chapterIndex);
-        buf.writeString(warp);
-        return buf;
-    }
+    public static final CustomPayload.Id<ChapterUpdatePacket> ID =
+            new CustomPayload.Id<>(Identifier.of("ardapaths", "path_chapter_update"));
 
-    public static ChapterUpdatePacket read(PacketByteBuf buf)
-    {
-        final String pathId = buf.readString();
-        final String chapterId = buf.readString();
-        final String chapterName = buf.readString();
-        final String chapterDate = buf.readString();
-        final int chapterIndex = buf.readInt();
-        final String warp = buf.readString();
-        return new ChapterUpdatePacket(pathId, chapterId, chapterName, chapterDate, chapterIndex, warp);
+    public static final PacketCodec<? super RegistryByteBuf, ChapterUpdatePacket> CODEC =
+            PacketCodec.tuple(
+                    PacketCodecs.STRING, ChapterUpdatePacket::pathId,
+                    PacketCodecs.STRING, ChapterUpdatePacket::chapterId,
+                    PacketCodecs.STRING, ChapterUpdatePacket::chapterName,
+                    PacketCodecs.STRING, ChapterUpdatePacket::chapterDate,
+                    PacketCodecs.INTEGER, ChapterUpdatePacket::chapterIndex,
+                    PacketCodecs.STRING, ChapterUpdatePacket::warp,
+                    ChapterUpdatePacket::new
+            );
+
+    @Override
+    public CustomPayload.Id<ChapterUpdatePacket> getId() {
+        return ID;
     }
 }

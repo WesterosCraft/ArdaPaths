@@ -1,33 +1,25 @@
 package space.ajcool.ardapaths.core.networking.handlers.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.network.ServerPlayerEntity;
 import space.ajcool.ardapaths.ArdaPaths;
-import space.ajcool.ardapaths.core.consumers.networking.ServerPacketHandler;
 import space.ajcool.ardapaths.core.data.config.shared.Color;
 import space.ajcool.ardapaths.core.data.config.shared.PathData;
 import space.ajcool.ardapaths.core.networking.packets.server.PathDataUpdatePacket;
 
-/**
- * A packet sent from the client to the server to request path data.
- */
-public class PathDataUpdateRequestHandler extends ServerPacketHandler<PathDataUpdatePacket>
-{
-    public PathDataUpdateRequestHandler()
-    {
-        super("path_data_update_request", PathDataUpdatePacket::read);
+public class PathDataUpdateRequestHandler {
+
+    public void send(PathDataUpdatePacket packet) {
+        ClientPlayNetworking.send(packet);
     }
 
-    @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PathDataUpdatePacket packet, PacketSender sender)
-    {
-        final String pathId = packet.id();
-        final String name = packet.name();
-        final int primaryColor = packet.primaryColor();
-        final int secondaryColor = packet.secondaryColor();
-        final int tertiaryColor = packet.tertiaryColor();
+    public void receive(PathDataUpdatePacket payload, ServerPlayNetworking.Context context) {
+        final String pathId = payload.id();
+        final String name = payload.name();
+        final int primaryColor = payload.primaryColor();
+        final int secondaryColor = payload.secondaryColor();
+        final int tertiaryColor = payload.tertiaryColor();
 
         PathData pathData = ArdaPaths.CONFIG.getPath(pathId);
 

@@ -57,7 +57,9 @@ public class PathMarkerBlockEntity extends BlockEntity implements NbtEncodeable
 
     public static void tick(World level, BlockPos blockPos, BlockState blockState, PathMarkerBlockEntity pathMarkerBlockEntity)
     {
-        Paths.addTickingMarker(pathMarkerBlockEntity);
+        if (level.isClient()) {
+            Paths.addTickingMarker(pathMarkerBlockEntity);
+        }
     }
 
     @Override

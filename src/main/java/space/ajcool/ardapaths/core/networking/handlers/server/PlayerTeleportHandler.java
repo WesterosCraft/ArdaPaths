@@ -1,43 +1,37 @@
 package space.ajcool.ardapaths.core.networking.handlers.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
-import space.ajcool.ardapaths.core.consumers.networking.ServerPacketHandler;
 import space.ajcool.ardapaths.core.networking.packets.server.PlayerTeleportPacket;
 
-public class PlayerTeleportHandler extends ServerPacketHandler<PlayerTeleportPacket>
-{
-    public PlayerTeleportHandler()
-    {
-        super("player_teleport", PlayerTeleportPacket::read);
+public class PlayerTeleportHandler {
+
+    public void send(PlayerTeleportPacket packet) {
+        ClientPlayNetworking.send(packet);
     }
 
-    @Override
-    protected void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PlayerTeleportPacket packet, PacketSender sender)
-    {
+    public void receive(PlayerTeleportPacket payload, ServerPlayNetworking.Context context) {
+        ServerPlayerEntity player = context.player();
+        MinecraftServer server = context.server();
 
         server.execute(() -> {
-
-            if (packet.worldId() != null) {
-
-                RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, packet.worldId());
+            if (payload.worldId() != null) {
+                RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, payload.worldId());
                 ServerWorld serverWorld = server.getWorld(key);
 
-                if (serverWorld != null){
-
-                    player.teleport(serverWorld, packet.x(), packet.y(), packet.z(), player.getYaw(), player.getPitch());
+                if (serverWorld != null) {
+                    player.teleport(serverWorld, payload.x(), payload.y(), payload.z(), player.getYaw(), player.getPitch());
                     return;
                 }
             }
 
-            player.teleport(packet.x(), packet.y(), packet.z(), false);
-
+            player.teleport(payload.x(), payload.y(), payload.z(), false);
         });
     }
 }
