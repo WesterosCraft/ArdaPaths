@@ -10,6 +10,8 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import space.ajcool.ardapaths.core.Client;
 
+import static net.minecraft.util.Identifier.ofVanilla;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -17,7 +19,9 @@ import java.util.function.Function;
 
 public class DropdownWidget<T> extends ClickableWidget
 {
-    private static final Identifier WIDGETS_TEXTURE = Identifier.of("textures/gui/widgets.png");
+    private static final Identifier BUTTON_TEXTURE = ofVanilla("widget/button");
+    private static final Identifier BUTTON_HIGHLIGHTED_TEXTURE = ofVanilla("widget/button_highlighted");
+    private static final Identifier BUTTON_DISABLED_TEXTURE = ofVanilla("widget/button_disabled");
 
     private final int originalWidth;
     private final int originalHeight;
@@ -116,10 +120,10 @@ public class DropdownWidget<T> extends ClickableWidget
         int x = getX();
         int y = getY();
 
-        int vScale = (mouseX >= x && mouseX <= x + originalWidth &&
-                mouseY >= y && mouseY <= y + originalHeight) ? 2 : 1;
-        int v = 46 + (vScale * 20);
-        renderBox(context, x, y, selected, textRenderer, originalWidth, originalHeight, v);
+        boolean hovered = mouseX >= x && mouseX <= x + originalWidth &&
+                mouseY >= y && mouseY <= y + originalHeight;
+        Identifier texture = hovered ? BUTTON_HIGHLIGHTED_TEXTURE : BUTTON_TEXTURE;
+        renderBox(context, x, y, selected, textRenderer, originalWidth, originalHeight, texture);
 
         String arrow = expanded ? "▲" : "▼";
         int arrowX = x + originalWidth - textRenderer.getWidth(arrow) - 4;
@@ -135,45 +139,34 @@ public class DropdownWidget<T> extends ClickableWidget
         TextRenderer textRenderer = Client.mc().textRenderer;
         int width = getWidth();
 
-        int v = 46;
+        Identifier texture;
         if (hovered)
         {
-            v += 40;
+            texture = BUTTON_HIGHLIGHTED_TEXTURE;
         }
         else if (selected)
         {
-            v += 20;
+            texture = BUTTON_TEXTURE;
         }
-        renderBox(context, x, y, item, textRenderer, width, originalHeight, v);
+        else
+        {
+            texture = BUTTON_DISABLED_TEXTURE;
+        }
+        renderBox(context, x, y, item, textRenderer, width, originalHeight, texture);
     }
 
     /**
      * Renders a box with text. If item is null, "None" is displayed.
      */
     private void renderBox(DrawContext context, int x, int y, T item, TextRenderer textRenderer,
-                           int width, int height, int v)
+                           int width, int height, Identifier texture)
     {
-        drawNineSlicedTexture(context, WIDGETS_TEXTURE, x, y, width, height, 4, 200, 20, 0, v);
+        context.drawGuiTexture(texture, x, y, width, height);
 
         Text display = (item == null) ? Text.literal("None") : optionDisplay.apply(item);
         int textX = x + 4;
         int textY = y + (height - textRenderer.fontHeight) / 2;
         context.drawTextWithShadow(textRenderer, display, textX, textY, 0xFFFFFF);
-    }
-
-    /**
-     * Draws a nine-sliced texture manually because drawNineSlicedTexture was removed in 1.21.
-     */
-    private static void drawNineSlicedTexture(DrawContext context, Identifier texture,
-                                              int x, int y, int width, int height,
-                                              int edgeWidth, int texW, int texH, int u, int v)
-    {
-        // Left edge
-        context.drawTexture(texture, x, y, edgeWidth, height, u, v, edgeWidth, texH, 256, 256);
-        // Middle (stretched)
-        context.drawTexture(texture, x + edgeWidth, y, width - edgeWidth * 2, height, u + edgeWidth, v, texW - edgeWidth * 2, texH, 256, 256);
-        // Right edge
-        context.drawTexture(texture, x + width - edgeWidth, y, edgeWidth, height, u + texW - edgeWidth, v, edgeWidth, texH, 256, 256);
     }
 
     /**
