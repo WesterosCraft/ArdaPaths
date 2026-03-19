@@ -10,6 +10,8 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import space.ajcool.ardapaths.core.Client;
 
+import static net.minecraft.util.Identifier.ofVanilla;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -17,7 +19,9 @@ import java.util.function.Function;
 
 public class DropdownWidget<T> extends ClickableWidget
 {
-    private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/widgets.png");
+    private static final Identifier BUTTON_TEXTURE = ofVanilla("widget/button");
+    private static final Identifier BUTTON_HIGHLIGHTED_TEXTURE = ofVanilla("widget/button_highlighted");
+    private static final Identifier BUTTON_DISABLED_TEXTURE = ofVanilla("widget/button_disabled");
 
     private final int originalWidth;
     private final int originalHeight;
@@ -58,10 +62,10 @@ public class DropdownWidget<T> extends ClickableWidget
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta)
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
     {
         // First, draw the button itself.
-        super.render(context, mouseX, mouseY, delta);
+        renderButton(context, mouseX, mouseY, delta);
         Text title = this.getMessage();
         if (title != null)
         {
@@ -110,17 +114,16 @@ public class DropdownWidget<T> extends ClickableWidget
         }
     }
 
-    @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta)
+    private void renderButton(DrawContext context, int mouseX, int mouseY, float delta)
     {
         TextRenderer textRenderer = Client.mc().textRenderer;
         int x = getX();
         int y = getY();
 
-        int vScale = (mouseX >= x && mouseX <= x + originalWidth &&
-                mouseY >= y && mouseY <= y + originalHeight) ? 2 : 1;
-        int v = 46 + (vScale * 20);
-        renderBox(context, x, y, selected, textRenderer, originalWidth, originalHeight, v);
+        boolean hovered = mouseX >= x && mouseX <= x + originalWidth &&
+                mouseY >= y && mouseY <= y + originalHeight;
+        Identifier texture = hovered ? BUTTON_HIGHLIGHTED_TEXTURE : BUTTON_TEXTURE;
+        renderBox(context, x, y, selected, textRenderer, originalWidth, originalHeight, texture);
 
         String arrow = expanded ? "▲" : "▼";
         int arrowX = x + originalWidth - textRenderer.getWidth(arrow) - 4;
@@ -136,25 +139,30 @@ public class DropdownWidget<T> extends ClickableWidget
         TextRenderer textRenderer = Client.mc().textRenderer;
         int width = getWidth();
 
-        int v = 46;
+        Identifier texture;
         if (hovered)
         {
-            v += 40;
+            texture = BUTTON_HIGHLIGHTED_TEXTURE;
         }
         else if (selected)
         {
-            v += 20;
+            texture = BUTTON_TEXTURE;
         }
-        renderBox(context, x, y, item, textRenderer, width, originalHeight, v);
+        else
+        {
+            texture = BUTTON_DISABLED_TEXTURE;
+        }
+        renderBox(context, x, y, item, textRenderer, width, originalHeight, texture);
     }
 
     /**
      * Renders a box with text. If item is null, "None" is displayed.
      */
     private void renderBox(DrawContext context, int x, int y, T item, TextRenderer textRenderer,
-                           int width, int height, int v)
+                           int width, int height, Identifier texture)
     {
-        context.drawNineSlicedTexture(WIDGETS_TEXTURE, x, y, width, height, 20, 4, 200, 20, 0, v);
+        context.drawGuiTexture(texture, x, y, width, height);
+
         Text display = (item == null) ? Text.literal("None") : optionDisplay.apply(item);
         int textX = x + 4;
         int textY = y + (height - textRenderer.fontHeight) / 2;
@@ -212,7 +220,6 @@ public class DropdownWidget<T> extends ClickableWidget
                 selected = item;
                 if (onSelect != null)
                 {
-                    System.out.println("Accepting");
                     onSelect.accept(item);
                 }
             }
@@ -227,7 +234,7 @@ public class DropdownWidget<T> extends ClickableWidget
      * the user can scroll using the mouse wheel.
      */
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount)
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
     {
         if (expanded)
         {
@@ -241,13 +248,13 @@ public class DropdownWidget<T> extends ClickableWidget
             if (totalItems > maxVisibleOptions)
             {
                 // Adjust scrollOffset
-                scrollOffset -= (int) amount;
+                scrollOffset -= (int) verticalAmount;
                 scrollOffset = Math.max(0, scrollOffset);
                 scrollOffset = Math.min(scrollOffset, totalItems - maxVisibleOptions);
                 return true;
             }
         }
-        return super.mouseScrolled(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override

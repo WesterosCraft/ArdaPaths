@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -56,7 +57,9 @@ public class PathMarkerBlockEntity extends BlockEntity implements NbtEncodeable
 
     public static void tick(World level, BlockPos blockPos, BlockState blockState, PathMarkerBlockEntity pathMarkerBlockEntity)
     {
-        Paths.addTickingMarker(pathMarkerBlockEntity);
+        if (level.isClient()) {
+            Paths.addTickingMarker(pathMarkerBlockEntity);
+        }
     }
 
     @Override
@@ -66,9 +69,9 @@ public class PathMarkerBlockEntity extends BlockEntity implements NbtEncodeable
     }
 
     @Override
-    public @NotNull NbtCompound toInitialChunkDataNbt()
+    public @NotNull NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup wrapper)
     {
-        return this.createNbt();
+        return this.createNbt(wrapper);
     }
 
     public void markUpdated()
@@ -83,11 +86,11 @@ public class PathMarkerBlockEntity extends BlockEntity implements NbtEncodeable
      * @param compoundTag The NBT compound tag
      */
     @Override
-    public void readNbt(NbtCompound compoundTag)
+    public void readNbt(NbtCompound compoundTag, RegistryWrapper.WrapperLookup wrapper)
     {
         NbtCompound converted = PathMarkerBlockEntityConverter.convertNbt(compoundTag);
 
-        super.readNbt(converted);
+        super.readNbt(converted, wrapper);
 
         this.applyNbt(converted.getCompound("paths"));
     }
@@ -98,9 +101,9 @@ public class PathMarkerBlockEntity extends BlockEntity implements NbtEncodeable
      * @param compoundTag The NBT compound tag
      */
     @Override
-    public void writeNbt(NbtCompound compoundTag)
+    public void writeNbt(NbtCompound compoundTag, RegistryWrapper.WrapperLookup wrapper)
     {
-        super.writeNbt(compoundTag);
+        super.writeNbt(compoundTag, wrapper);
         this.toNbt(compoundTag);
     }
 
@@ -468,7 +471,7 @@ public class PathMarkerBlockEntity extends BlockEntity implements NbtEncodeable
         @Override
         public void applyNbt(NbtCompound nbt)
         {
-            this.target = nbt.contains("target") ? NbtHelper.toBlockPos(nbt.getCompound("target")) : null;
+            this.target = nbt.contains("target") ? NbtHelper.toBlockPos(nbt, "target").orElse(null) : null;
             this.proximityMessage = nbt.getString("proximity_message");
             this.activationRange = nbt.getInt("activation_range");
             this.chapterId = nbt.getString("chapter");

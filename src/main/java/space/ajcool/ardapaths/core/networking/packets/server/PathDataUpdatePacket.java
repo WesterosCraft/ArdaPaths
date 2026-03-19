@@ -1,8 +1,10 @@
 package space.ajcool.ardapaths.core.networking.packets.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.network.PacketByteBuf;
-import space.ajcool.ardapaths.core.consumers.networking.IPacket;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 
 public record PathDataUpdatePacket(
         String id,
@@ -10,28 +12,23 @@ public record PathDataUpdatePacket(
         int primaryColor,
         int secondaryColor,
         int tertiaryColor
-) implements IPacket
-{
+) implements CustomPayload {
+
+    public static final CustomPayload.Id<PathDataUpdatePacket> ID =
+            new CustomPayload.Id<>(Identifier.of("ardapaths", "path_data_update_request"));
+
+    public static final PacketCodec<? super RegistryByteBuf, PathDataUpdatePacket> CODEC =
+            PacketCodec.tuple(
+                    PacketCodecs.STRING, PathDataUpdatePacket::id,
+                    PacketCodecs.STRING, PathDataUpdatePacket::name,
+                    PacketCodecs.INTEGER, PathDataUpdatePacket::primaryColor,
+                    PacketCodecs.INTEGER, PathDataUpdatePacket::secondaryColor,
+                    PacketCodecs.INTEGER, PathDataUpdatePacket::tertiaryColor,
+                    PathDataUpdatePacket::new
+            );
 
     @Override
-    public PacketByteBuf build()
-    {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeString(id);
-        buf.writeString(name);
-        buf.writeInt(primaryColor);
-        buf.writeInt(secondaryColor);
-        buf.writeInt(tertiaryColor);
-        return buf;
-    }
-
-    public static space.ajcool.ardapaths.core.networking.packets.server.PathDataUpdatePacket read(PacketByteBuf buf)
-    {
-        final String pathId = buf.readString();
-        final String pathName = buf.readString();
-        final int pathPrimaryColor = buf.readInt();
-        final int pathSecondaryColor = buf.readInt();
-        final int pathTertiaryColor = buf.readInt();
-        return new space.ajcool.ardapaths.core.networking.packets.server.PathDataUpdatePacket(pathId, pathName, pathPrimaryColor, pathSecondaryColor, pathTertiaryColor);
+    public CustomPayload.Id<PathDataUpdatePacket> getId() {
+        return ID;
     }
 }

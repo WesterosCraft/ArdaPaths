@@ -1,25 +1,25 @@
 package space.ajcool.ardapaths.core.networking.packets.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.network.PacketByteBuf;
-import space.ajcool.ardapaths.core.consumers.networking.IPacket;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 
-public record ChapterStartRemovePacket(String pathId, String chapterId) implements IPacket
-{
+public record ChapterStartRemovePacket(String pathId, String chapterId) implements CustomPayload {
+
+    public static final CustomPayload.Id<ChapterStartRemovePacket> ID =
+            new CustomPayload.Id<>(Identifier.of("ardapaths", "chapter_start_remove"));
+
+    public static final PacketCodec<? super RegistryByteBuf, ChapterStartRemovePacket> CODEC =
+            PacketCodec.tuple(
+                    PacketCodecs.STRING, ChapterStartRemovePacket::pathId,
+                    PacketCodecs.STRING, ChapterStartRemovePacket::chapterId,
+                    ChapterStartRemovePacket::new
+            );
 
     @Override
-    public PacketByteBuf build()
-    {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeString(pathId);
-        buf.writeString(chapterId);
-        return buf;
-    }
-
-    public static ChapterStartRemovePacket read(PacketByteBuf buf)
-    {
-        final String pathId = buf.readString();
-        final String chapterId = buf.readString();
-        return new ChapterStartRemovePacket(pathId, chapterId);
+    public CustomPayload.Id<ChapterStartRemovePacket> getId() {
+        return ID;
     }
 }

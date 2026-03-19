@@ -1,41 +1,35 @@
 package space.ajcool.ardapaths.core.networking.handlers.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import space.ajcool.ardapaths.ArdaPaths;
-import space.ajcool.ardapaths.core.consumers.networking.ServerPacketHandler;
-import space.ajcool.ardapaths.core.conversions.PathMarkerBlockEntityConverter;
 import space.ajcool.ardapaths.core.networking.packets.server.PathMarkerLinksUpdatePacket;
-import space.ajcool.ardapaths.core.networking.packets.server.PathMarkerUpdatePacket;
 import space.ajcool.ardapaths.mc.blocks.entities.PathMarkerBlockEntity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PathMarkerLinksUpdateHandler extends ServerPacketHandler<PathMarkerLinksUpdatePacket>
-{
-    public PathMarkerLinksUpdateHandler()
-    {
-        super("path_marker_links_update", PathMarkerLinksUpdatePacket::read);
+public class PathMarkerLinksUpdateHandler {
+
+    public void send(PathMarkerLinksUpdatePacket packet) {
+        ClientPlayNetworking.send(packet);
     }
 
-    @Override
-    protected void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PathMarkerLinksUpdatePacket packet, PacketSender sender)
-    {
-        BlockPos blockPos = packet.position();
+    public void receive(PathMarkerLinksUpdatePacket payload, ServerPlayNetworking.Context context) {
+        ServerPlayerEntity player = context.player();
+        MinecraftServer server = context.server();
 
-        server.execute(() ->
-        {
+        BlockPos blockPos = payload.position();
+
+        server.execute(() -> {
             BlockEntity blockEntity = player.getWorld().getBlockEntity(blockPos);
 
-            if (blockEntity instanceof PathMarkerBlockEntity marker)
-            {
-                marker.applyNbt(syncPathsFromIncoming(marker.toNbt(), packet.data()));
+            if (blockEntity instanceof PathMarkerBlockEntity marker) {
+                marker.applyNbt(syncPathsFromIncoming(marker.toNbt(), payload.data()));
                 marker.markUpdated();
             }
         });

@@ -1,38 +1,31 @@
 package space.ajcool.ardapaths.core.networking.handlers.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import space.ajcool.ardapaths.ArdaPaths;
-import space.ajcool.ardapaths.core.consumers.networking.ServerPacketHandler;
 import space.ajcool.ardapaths.core.data.config.shared.ChapterData;
 import space.ajcool.ardapaths.core.data.config.shared.PathData;
 import space.ajcool.ardapaths.core.networking.packets.server.ChapterUpdatePacket;
 
-public class ChapterUpdateHandler extends ServerPacketHandler<ChapterUpdatePacket>
-{
-    public ChapterUpdateHandler()
-    {
-        super("path_chapter_update", ChapterUpdatePacket::read);
+public class ChapterUpdateHandler {
+
+    public void send(ChapterUpdatePacket packet) {
+        ClientPlayNetworking.send(packet);
     }
 
-    @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, ChapterUpdatePacket packet, PacketSender sender)
-    {
-        final String pathId = packet.pathId();
+    public void receive(ChapterUpdatePacket payload, ServerPlayNetworking.Context context) {
+        final String pathId = payload.pathId();
         final PathData pathData = ArdaPaths.CONFIG.getPath(pathId);
-        if (pathData == null)
-        {
+        if (pathData == null) {
             return;
         }
 
-        final String chapterId = packet.chapterId();
-        final String chapterName = packet.chapterName();
-        final String chapterDate = packet.chapterDate();
-        final int chapterIndex = packet.chapterIndex();
-        final String warp = packet.warp();
-        final ChapterData chapterData = new ChapterData(chapterId, chapterName, chapterDate, chapterIndex,warp);
+        final String chapterId = payload.chapterId();
+        final String chapterName = payload.chapterName();
+        final String chapterDate = payload.chapterDate();
+        final int chapterIndex = payload.chapterIndex();
+        final String warp = payload.warp();
+        final ChapterData chapterData = new ChapterData(chapterId, chapterName, chapterDate, chapterIndex, warp);
 
         pathData.setChapter(chapterData);
         ArdaPaths.CONFIG_MANAGER.save();

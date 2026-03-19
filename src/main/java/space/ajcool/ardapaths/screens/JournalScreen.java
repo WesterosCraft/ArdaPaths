@@ -79,7 +79,6 @@ public class JournalScreen extends Screen {
 
         // Center vertically
         int listTop = (height - listHeight) / 2 + 20;
-        int listBottom = listTop + listHeight;
 
         // Title above list
         int titleY = listTop - 25;
@@ -91,11 +90,11 @@ public class JournalScreen extends Screen {
         );
 
         JournalListWidget listWidget = new JournalListWidget(
-                this.client, totalUiWidth, listHeight, listTop, listBottom, 32
+                this.client, totalUiWidth, listHeight, listTop, 32
         );
 
         // Center horizontally
-        listWidget.setLeftPos((width - totalUiWidth) / 2);
+        listWidget.setPosition((width - totalUiWidth) / 2, listTop);
 
         // Add pre-built entries
         for (JournalListEntry entry : entries) {
@@ -138,7 +137,6 @@ public class JournalScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
-        this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
     }
 }

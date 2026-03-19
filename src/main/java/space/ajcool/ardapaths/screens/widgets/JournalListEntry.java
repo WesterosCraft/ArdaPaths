@@ -146,7 +146,7 @@ public class JournalListEntry extends AlwaysSelectedEntryListWidget.Entry<Journa
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
-        if (this.teleportButton.isMouseOver(mouseX, mouseY)) {
+        if (this.teleportButton != null && this.teleportButton.isMouseOver(mouseX, mouseY)) {
             return this.teleportButton.mouseClicked(mouseX, mouseY, button);
         }
         return false;

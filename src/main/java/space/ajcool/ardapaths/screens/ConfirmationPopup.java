@@ -48,7 +48,7 @@ public class ConfirmationPopup extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
+        super.render(context, mouseX, mouseY, delta);
 
         // Draw centered text
         context.drawCenteredTextWithShadow(
@@ -58,8 +58,6 @@ public class ConfirmationPopup extends Screen {
                 this.height / 2 - 20,
                 0xFFFFFF
         );
-
-        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override

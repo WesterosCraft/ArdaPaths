@@ -1,31 +1,22 @@
 package space.ajcool.ardapaths.core.networking.handlers.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import space.ajcool.ardapaths.ArdaPaths;
-import space.ajcool.ardapaths.core.consumers.networking.ServerPacketHandler;
-import space.ajcool.ardapaths.core.data.config.shared.ChapterData;
 import space.ajcool.ardapaths.core.data.config.shared.PathData;
 import space.ajcool.ardapaths.core.networking.packets.server.ChapterDeletePacket;
-import space.ajcool.ardapaths.core.networking.packets.server.ChapterUpdatePacket;
 
-public class ChapterDeleteHandler extends ServerPacketHandler<ChapterDeletePacket>
-{
-    public ChapterDeleteHandler()
-    {
-        super("path_chapter_delete", ChapterDeletePacket::read);
+public class ChapterDeleteHandler {
+
+    public void send(ChapterDeletePacket packet) {
+        ClientPlayNetworking.send(packet);
     }
 
-    @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, ChapterDeletePacket packet, PacketSender sender)
-    {
-        final String pathId = packet.pathId();
-        final String chapterId = packet.chapterId();
+    public void receive(ChapterDeletePacket payload, ServerPlayNetworking.Context context) {
+        final String pathId = payload.pathId();
+        final String chapterId = payload.chapterId();
         final PathData pathData = ArdaPaths.CONFIG.getPath(pathId);
-        if (pathData == null)
-        {
+        if (pathData == null) {
             return;
         }
 

@@ -11,7 +11,6 @@ import space.ajcool.ardapaths.core.data.config.client.ClientConfig;
 import space.ajcool.ardapaths.core.data.config.shared.Color;
 import space.ajcool.ardapaths.core.data.config.shared.PathData;
 import space.ajcool.ardapaths.core.networking.PacketRegistry;
-import space.ajcool.ardapaths.core.networking.packets.EmptyPacket;
 import space.ajcool.ardapaths.mc.items.ModItems;
 
 import java.lang.reflect.Type;
@@ -47,7 +46,7 @@ public class ClientConfigManager extends ConfigManager<ClientConfig>
         }
         else
         {
-            PacketRegistry.PATH_DATA_REQUEST.send(new EmptyPacket(), response ->
+            PacketRegistry.PATH_DATA_REQUEST.send(response ->
             {
                 String json = response.json();
 

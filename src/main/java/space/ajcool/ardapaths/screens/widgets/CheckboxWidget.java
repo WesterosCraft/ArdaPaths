@@ -14,7 +14,10 @@ import java.util.function.Consumer;
 
 public class CheckboxWidget extends PressableWidget
 {
-    private static final Identifier TEXTURE = new Identifier("textures/gui/checkbox.png");
+    private static final Identifier CHECKBOX = Identifier.ofVanilla("widget/checkbox");
+    private static final Identifier CHECKBOX_HIGHLIGHTED = Identifier.ofVanilla("widget/checkbox_highlighted");
+    private static final Identifier CHECKBOX_SELECTED = Identifier.ofVanilla("widget/checkbox_selected");
+    private static final Identifier CHECKBOX_SELECTED_HIGHLIGHTED = Identifier.ofVanilla("widget/checkbox_selected_highlighted");
     private final Text text;
     private boolean checked;
     private boolean enabled;
@@ -30,7 +33,7 @@ public class CheckboxWidget extends PressableWidget
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta)
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
     {
         int x = this.getX();
         int y = this.getY();
@@ -53,28 +56,16 @@ public class CheckboxWidget extends PressableWidget
             return;
         }
 
-        if (this.isHovered())
+        Identifier texture;
+        if (checked)
         {
-            if (checked)
-            {
-                context.drawTexture(TEXTURE, x, y, width, height, 20, 20, 20, 20, 64, 64);
-            }
-            else
-            {
-                context.drawTexture(TEXTURE, x, y, width, height, 20, 0, 20, 20, 64, 64);
-            }
+            texture = this.isHovered() ? CHECKBOX_SELECTED_HIGHLIGHTED : CHECKBOX_SELECTED;
         }
         else
         {
-            if (checked)
-            {
-                context.drawTexture(TEXTURE, x, y, width, height, 0, 20, 20, 20, 64, 64);
-            }
-            else
-            {
-                context.drawTexture(TEXTURE, x, y, width, height, 0, 0, 20, 20, 64, 64);
-            }
+            texture = this.isHovered() ? CHECKBOX_HIGHLIGHTED : CHECKBOX;
         }
+        context.drawGuiTexture(texture, x, y, width, height);
 
 
         int textX = x - width - textRenderer.getWidth(text) + 10;

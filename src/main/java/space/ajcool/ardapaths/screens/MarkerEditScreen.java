@@ -197,7 +197,7 @@ public class MarkerEditScreen extends Screen
 
             this.addDrawableChild(TextBuilder.create()
                     .setPosition(x, y)
-                    .setSize(280, 20)
+                    .setSize(360, 20)
                     .setText(Text.translatable("ardapaths.client.marker.configuration.screens.linked_chapters_and_paths", linkedPaths, linkedChapters))
                     .build()
             );
@@ -206,8 +206,8 @@ public class MarkerEditScreen extends Screen
                 this.buildMarkerEditLinksButton(x+260, y);
         } else {
             this.addDrawableChild(TextBuilder.create()
-                    .setPosition(x + 35, y)
-                    .setSize(280, 20)
+                    .setPosition(x, y)
+                    .setSize(360, 20)
                     .setText(Text.translatable("ardapaths.client.marker.configuration.screens.no_linked_chapters_and_paths"))
                     .build()
             );
@@ -272,7 +272,7 @@ public class MarkerEditScreen extends Screen
                     return label;
                 })
                 .setOptions(chapters)
-                .setSelected(ArdaPathsClient.CONFIG.getPath(selectedPathId).getChapter(selectedChapterId))
+                .setSelected(selectedPath != null ? selectedPath.getChapter(selectedChapterId) : null)
                 .setOnSelect(chapter ->
                 {
                     selectedChapterId = chapter.getId();
@@ -461,7 +461,7 @@ public class MarkerEditScreen extends Screen
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta)
     {
-        this.renderBackground(context);
+        super.render(context, mouseX, mouseY, delta);
 
         int centerX = this.width / 2;
         int currentY = 112;
@@ -475,21 +475,12 @@ public class MarkerEditScreen extends Screen
         context.drawTextWithShadow(this.textRenderer, Text.translatable("ardapaths.client.marker.configuration.screens.ffactor"), centerX + 45, sideY += 20, 0xFFFFFF);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("ardapaths.client.marker.configuration.screens.fspeed"), centerX + 49, sideY += 20, 0xFFFFFF);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("ardapaths.client.marker.configuration.screens.opacity"), centerX + 53, sideY += 20, 0xFFFFFF);
-
-        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button)
     {
-        return super.mouseReleased(mouseX, mouseY, button) || this.multiLineEditBox.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    public void tick()
-    {
-        this.multiLineEditBox.tick();
-        super.tick();
+        return super.mouseReleased(mouseX, mouseY, button) || (this.multiLineEditBox != null && this.multiLineEditBox.mouseReleased(mouseX, mouseY, button));
     }
 
     public void saveAndClose()

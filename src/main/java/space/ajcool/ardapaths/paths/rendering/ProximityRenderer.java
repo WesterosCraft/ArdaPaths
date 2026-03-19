@@ -2,6 +2,7 @@ package space.ajcool.ardapaths.paths.rendering;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Hand;
 import org.jetbrains.annotations.NotNull;
 import space.ajcool.ardapaths.core.Client;
@@ -39,7 +40,8 @@ public class ProximityRenderer {
 
     private AnimatedTitle currentDisplayedTitle;
 
-    public static void render(DrawContext context, float delta) {
+    public static void render(DrawContext context, RenderTickCounter tickCounter) {
+        float delta = tickCounter.getTickDelta(true);
         INSTANCE.renderNextItem(context, delta);
         updateVisualMessageStack(context);
     }
@@ -51,7 +53,8 @@ public class ProximityRenderer {
      */
     public static void addMessage(@NotNull AnimatedMessage animatedMessage) {
 
-        if (INSTANCE.currentDisplayedMessage != null && INSTANCE.currentDisplayedMessage.equals(animatedMessage)) return;
+        if (INSTANCE.currentDisplayedMessage != null && INSTANCE.currentDisplayedMessage.equals(animatedMessage))
+            return;
 
         INSTANCE.addToQueue(animatedMessage);
     }
@@ -106,8 +109,8 @@ public class ProximityRenderer {
         }
 
         // Render current items if available
-        if (currentDisplayedMessage != null)    currentDisplayedMessage.render(context);
-        if (currentDisplayedTitle != null)      currentDisplayedTitle.render(context);
+        if (currentDisplayedMessage != null) currentDisplayedMessage.render(context);
+        if (currentDisplayedTitle != null) currentDisplayedTitle.render(context);
     }
 
     /**
@@ -118,7 +121,7 @@ public class ProximityRenderer {
      * between 1 and 64.
      */
     @SuppressWarnings("DataFlowIssue")
-    private static void updateVisualMessageStack(DrawContext context){
+    private static void updateVisualMessageStack(DrawContext context) {
 
         var count = (INSTANCE.currentDisplayedMessage != null && !INSTANCE.currentDisplayedMessage.isFinished()) ? 1 : 0;
         count += (INSTANCE.currentDisplayedTitle != null && !INSTANCE.currentDisplayedTitle.isFinished()) ? 1 : 0;

@@ -1,30 +1,27 @@
 package space.ajcool.ardapaths.core.networking.packets.server;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
-import space.ajcool.ardapaths.core.consumers.networking.IPacket;
 
-public record PlayerTeleportPacket(double x, double y, double z, Identifier worldId) implements IPacket
-{
+public record PlayerTeleportPacket(double x, double y, double z, Identifier worldId) implements CustomPayload {
+
+    public static final CustomPayload.Id<PlayerTeleportPacket> ID =
+            new CustomPayload.Id<>(Identifier.of("ardapaths", "player_teleport"));
+
+    public static final PacketCodec<? super RegistryByteBuf, PlayerTeleportPacket> CODEC =
+            PacketCodec.tuple(
+                    PacketCodecs.DOUBLE, PlayerTeleportPacket::x,
+                    PacketCodecs.DOUBLE, PlayerTeleportPacket::y,
+                    PacketCodecs.DOUBLE, PlayerTeleportPacket::z,
+                    Identifier.PACKET_CODEC, PlayerTeleportPacket::worldId,
+                    PlayerTeleportPacket::new
+            );
 
     @Override
-    public PacketByteBuf build()
-    {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeDouble(x);
-        buf.writeDouble(y);
-        buf.writeDouble(z);
-        buf.writeIdentifier(worldId);
-        return buf;
-    }
-
-    public static PlayerTeleportPacket read(PacketByteBuf buf)
-    {
-        final double x = buf.readDouble();
-        final double y = buf.readDouble();
-        final double z = buf.readDouble();
-        final Identifier worldId = buf.readIdentifier();
-        return new PlayerTeleportPacket(x, y, z, worldId);
+    public CustomPayload.Id<PlayerTeleportPacket> getId() {
+        return ID;
     }
 }

@@ -112,8 +112,8 @@ public class MarkerLinksEditScreen extends Screen {
         } else {
 
             this.addDrawableChild(TextBuilder.create()
-                    .setPosition(centerX - 70, y+30)
-                    .setSize(140, 20)
+                    .setPosition(centerX - 140, y+30)
+                    .setSize(280, 20)
                     .setText(Text.translatable("ardapaths.client.chapter.configuration.screens.marker.links.no_linked_data"))
                     .build()
             );
@@ -137,7 +137,6 @@ public class MarkerLinksEditScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
     }
 

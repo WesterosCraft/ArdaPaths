@@ -77,9 +77,10 @@ public class PathSelectionScreen extends Screen
         String currentChapterName = currentChapter != null ? currentChapter.getName() : "0";
         String currentPathName = currentPath != null ? currentPath.getName() : Text.translatable("ardapaths.client.configuration.screens.generic_path").toString();
 
+        int totalContentWidth = UI_ELEMENT_WIDTH * 2 + COLUMNS_SPACING;
         this.addDrawableChild(TextBuilder.create()
-                .setPosition(center - 75, y)
-                .setSize(150, 20)
+                .setPosition(center - totalContentWidth / 2, y)
+                .setSize(totalContentWidth, 20)
                 .setText(Text.literal(Text.translatable("ardapaths.client.configuration.screens.path_selection.current_path_chapter",currentChapterName).getString())
                         .append(Text.literal(Text.translatable(currentPathName).getString())
                                 .fillStyle(Style.EMPTY.withColor(currentPath != null ? currentPath.getPrimaryColor().asHex() : Color.fromRgb(100, 100, 100).asHex()))))
@@ -338,7 +339,6 @@ public class PathSelectionScreen extends Screen
     public void render(DrawContext context, int mouseX, int mouseY, float delta)
     {
 
-        this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
     }
 }
